@@ -1,0 +1,22 @@
+{
+    "name": "redstream/mysql-tools",
+    "version": "1.0.0",
+    "type": "project",
+    "require": {
+        "php": "^7.2",
+        "ext-mysqli": "*",
+        "symfony/console": "^4.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "" : "src/"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yauheni Kiryienkau",
+            "email": "ya@redstream.by"
+        }
+    ]
+}

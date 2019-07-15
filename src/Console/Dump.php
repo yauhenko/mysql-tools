@@ -2,7 +2,6 @@
 
 namespace Console;
 
-use Exception;
 use Framework\DB\Client;
 use Framework\DB\Pagination\Pager;
 use Symfony\Component\Console\Command\Command;
@@ -11,25 +10,29 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Exception;
 use Throwable;
 
 class Dump extends Command {
 
 	protected function configure() {
 		$this->setName('dump')->setDescription('Create dump');
-		$this->addArgument('uri', InputArgument::REQUIRED, 'Connection string');
-		$this->addArgument('dump', InputArgument::OPTIONAL, 'Output dump file', 'output.dump');
-		$this->addOption('only-data', 'd', InputOption::VALUE_OPTIONAL, 'Only data', false);
-		$this->addOption('only-struct', 's', InputOption::VALUE_OPTIONAL, 'Only structure', false);
+		$this->addArgument('dumpfile', InputArgument::OPTIONAL, 'Output dump file', 'output.dump');
+		$this->addOption('only-data', 'd', InputOption::VALUE_OPTIONAL, 'Only data', 'no');
+		$this->addOption('only-struct', 's', InputOption::VALUE_OPTIONAL, 'Only structure', 'no');
+		$this->addOption('host', null, InputOption::VALUE_OPTIONAL, 'Hostname', 'localhost');
+		$this->addOption('port', null, InputOption::VALUE_OPTIONAL, 'Port', 3306);
+		$this->addOption('user', 'u', InputOption::VALUE_OPTIONAL, 'Username', 'root');
+		$this->addOption('pass', 'p', InputOption::VALUE_OPTIONAL, 'Password', '');
+		$this->addOption('database', 'b', InputOption::VALUE_OPTIONAL, 'Database name', '');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$io = new SymfonyStyle($input, $output);
-		$uri = $input->getArgument('uri');
-		$dump = $input->getArgument('dump');
+		$dump = $input->getArgument('dumpfile');
 
-		$onlyData = $input->getOption('only-data') !== false;
-		$onlyStruct = $input->getOption('only-struct') !== false;
+		$onlyData = $input->getOption('only-data') !== 'no';
+		$onlyStruct = $input->getOption('only-struct') !== 'no';
 
 		if($onlyData && $onlyStruct)
 			throw new Exception('Invalid command');
@@ -38,7 +41,13 @@ class Dump extends Command {
 
 		try {
 
-			$db = Client::createFromUri($uri);
+			$host = $input->getOption('host');
+			$user = $input->getOption('user');
+			$pass = (string)$input->getOption('pass');
+			$database = (string)$input->getOption('database');
+			$port = (int)$input->getOption('port');
+			$db = new Client($host, $user, $pass, $database, $port);
+
 			$sig = md5(time());
 
 			$meta = [
@@ -91,13 +100,13 @@ class Dump extends Command {
 
 			$time = microtime(true) - $start;
 			$io->success('Done in ' . sprintf('%.2f', $time) . 's');
-			exit;
+			exit(0);
 
 		} catch (Throwable $e) {
 			$io->error($e->getMessage());
+			@unlink("{$dump}.tmp");
 			exit(1);
 		}
-
 
 	}
 

@@ -1,6 +1,7 @@
 {
-    "name": "redstream/mysql-tools",
-    "version": "1.1.0",
+    "name": "yauhenko/mysql-tools",
+    "description": "Simple tool to create and restore mysql dumps",
+    "version": "1.2.0",
     "type": "project",
     "require": {
         "php": "^7.2",

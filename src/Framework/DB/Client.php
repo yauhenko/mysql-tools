@@ -423,9 +423,11 @@ class Client {
     	return $this->enum('SHOW TABLES');
     }
 
-    public function showCreateTable(string $table): ?string {
+    public function showCreateTable(string $table, bool $onlyStruct = false): ?string {
     	$r = $this->enum('SHOW CREATE TABLE ' . $this->escapeId($table));
-    	return $r[$table];
+    	$sql =  $r[$table];
+    	if($onlyStruct) $sql = preg_replace('/AUTO_INCREMENT=[0-9]+ /isU', '', $sql);
+    	return $sql;
     }
 
 }

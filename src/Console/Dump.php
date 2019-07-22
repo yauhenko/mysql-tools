@@ -69,7 +69,7 @@ class Dump extends Command {
 
 				fwrite($f, json_encode([
 					'table' => $table,
-					'struct' => !$onlyData ? $db->showCreateTable($table) : null
+					'struct' => !$onlyData ? $db->showCreateTable($table, $onlyStruct) : null
 				]) . PHP_EOL);
 
 				if(!$onlyStruct) {

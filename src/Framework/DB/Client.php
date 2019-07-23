@@ -426,6 +426,7 @@ class Client {
     public function showCreateTable(string $table, bool $onlyStruct = false): ?string {
     	$r = $this->enum('SHOW CREATE TABLE ' . $this->escapeId($table));
     	$sql =  $r[$table];
+    	$sql = preg_replace("/\n\s+/isU", '', $sql);
     	if($onlyStruct) $sql = preg_replace('/AUTO_INCREMENT=[0-9]+ /isU', '', $sql);
     	return $sql;
     }
